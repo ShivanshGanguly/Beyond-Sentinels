@@ -1,0 +1,280 @@
+<% layout("layouts/boilerplate.ejs") %>
+
+    <style>
+        .dashboard {
+            padding: 15px;
+        }
+
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-header h1 {
+            margin: 0;
+        }
+
+        .ward-select {
+            width: 240px;
+            max-width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .metric-card {
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 175px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .metric-card h5 {
+            font-size: 1rem;
+            margin-bottom: 18px;
+        }
+
+        .metric-card h1 {
+            font-size: clamp(1.7rem, 3vw, 2.6rem);
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .heatmap-card {
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        #mumbaiHeatmap {
+            height: 780px;
+            width: 100%;
+        }
+
+        @media(max-width:991px) {
+            #mumbaiHeatmap {
+                height: 600px;
+            }
+
+            .metric-card {
+                min-height: 140px;
+            }
+        }
+
+        @media(max-width:767px) {
+            .dashboard {
+                padding: 8px;
+            }
+
+            .dashboard-header {
+                align-items: stretch;
+            }
+
+            .ward-select {
+                width: 100%;
+            }
+
+            #mumbaiHeatmap {
+                height: 480px;
+            }
+
+            .metric-card {
+                min-height: 120px;
+                padding: 15px;
+            }
+        }
+    </style>
+
+    <div class="container-fluid dashboard" id="risk">
+
+        <div class="dashboard-header">
+            <h1 class="heading-1 fw-bold">Risk Heatmap</h1>
+
+            <select id="wardSelect" class="form-select ward-select">
+                <option value="">Loading wards...</option>
+            </select>
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-12 col-lg-9">
+                <div class="card heatmap-card">
+                    <div id="mumbaiHeatmap"></div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-3">
+
+                <div class="card metric-card bg-danger-subtle border-danger">
+                    <h5>Wet Bulb Globe Temperature (WBGT)</h5>
+                    <h1 id="wbgtValue">Loading...</h1>
+                </div>
+
+                <div class="card metric-card bg-warning-subtle border-warning mt-3">
+                    <h5>Heat Mortality Risk Index (HMRI)</h5>
+                    <h1 id="hmriValue">Loading...</h1>
+                </div>
+
+                <div class="card metric-card bg-info-subtle border-info mt-3">
+                    <h5>Risk Level</h5>
+                    <h1 id="riskLevel">Loading...</h1>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const wardSelect = document.getElementById("wardSelect");
+
+        async function loadWards() {
+            try {
+                const response = await fetch("/api/wards");
+
+                if (!response.ok) {
+                    throw new Error("Unable to load wards");
+                }
+
+                const data = await response.json();
+
+                const wards = Array.isArray(data)
+                    ? data
+                    : data.wards || data.data || [];
+
+                wardSelect.innerHTML = "";
+
+                wards.forEach(ward => {
+                    const id = ward.wardID ?? ward.ward_id ?? ward.id;
+                    const name = ward.wardName ?? ward.ward_name ?? ward.name;
+
+                    if (id == null) return;
+
+                    const option = document.createElement("option");
+                    option.value = id;
+                    option.textContent = name || `Ward ${id}`;
+
+                    wardSelect.appendChild(option);
+                });
+
+                if (!wards.length) {
+                    wardSelect.innerHTML =
+                        '<option value="">No wards available</option>';
+                    return;
+                }
+
+                loadWardPrediction();
+
+            } catch (error) {
+                console.error("Ward loading error:", error);
+                wardSelect.innerHTML =
+                    '<option value="">Failed to load wards</option>';
+            }
+        }
+
+        async function loadWardPrediction() {
+            const wardID = wardSelect.value;
+
+            if (!wardID) return;
+
+            document.getElementById("wbgtValue").textContent = "Loading...";
+            document.getElementById("hmriValue").textContent = "Loading...";
+            document.getElementById("riskLevel").textContent = "Loading...";
+
+            try {
+                const response = await fetch("/api/predict/wards", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify({
+                        wardID: Number(wardID)
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Ward prediction failed");
+                }
+
+                const data = await response.json();
+
+                console.log("Selected ward prediction:", data);
+
+                console.log("FULL WARD API RESPONSE:", data);
+
+                const prediction =
+                    data["3d"] ||
+                    data["3_day"] ||
+                    data.predictions?.["3d"] ||
+                    data.prediction ||
+                    data;
+
+                const wbgtValue =
+                    prediction.wbgt_c ??
+                    prediction.wbgt ??
+                    prediction.WBGT ??
+                    data.heatStress;
+
+                const hmriValue =
+                    prediction.hmri ??
+                    prediction.HMRI ??
+                    prediction.hmri_value ??
+                    data.mortalityRisk;
+
+                const riskValue =
+                    prediction.risk_level ??
+                    prediction.riskLevel ??
+                    prediction.risk ??
+                    prediction.level ??
+                    data.riskLevel;
+
+                const wbgt = Number(wbgtValue);
+                const hmri = Number(hmriValue);
+
+                const risk = riskValue;
+
+                document.getElementById("wbgtValue").textContent =
+                    Number.isFinite(wbgt) ? wbgt.toFixed(2) + "°C" : "Unavailable";
+
+                document.getElementById("hmriValue").textContent =
+                    Number.isFinite(hmri) ? hmri.toFixed(2) : "Unavailable";
+
+                document.getElementById("riskLevel").textContent =
+                    risk || "Unavailable";
+
+            } catch (error) {
+                console.error("Ward prediction error:", error);
+
+                document.getElementById("wbgtValue").textContent = "Error";
+                document.getElementById("hmriValue").textContent = "Error";
+                document.getElementById("riskLevel").textContent = "Unavailable";
+            }
+        }
+
+        wardSelect.addEventListener("change", loadWardPrediction);
+
+        document.addEventListener("DOMContentLoaded", loadWards);
+
+        window.addEventListener("load", function () {
+            setTimeout(function () {
+                if (typeof map !== "undefined" && map) {
+                    map.invalidateSize();
+                }
+            }, 500);
+        });
+
+        window.addEventListener("resize", function () {
+            if (typeof map !== "undefined" && map) {
+                map.invalidateSize();
+            }
+        });
+    </script>

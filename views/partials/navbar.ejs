@@ -141,14 +141,14 @@
 
 <nav id="mainNavbar" class="navbar">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">TaapSurakshak</a>
+        <a class="navbar-brand" href="/">HeatAwareness  </a>
         <button id="sidebarToggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
             <span id="toggleIcon">☰</span>
         </button>
         <div class="navbar-nav">
-            <a class="nav-link" href="/risk">Heatmap</a>
-            <a class="nav-link" href="/predict">Intervene</a>
-            <a class="nav-link" href="/alerts">Comparision</a>
+            <a class="nav-link" href="#risk">Heatmap</a>
+            <a class="nav-link" href="#intervene">Intervene</a>
+            <a class="nav-link" href="#comparision">Comparision</a>
         </div>
         <div class="user-section">
             <span class="navbar-text">Welcome, Beyond</span>
@@ -168,13 +168,6 @@ document.addEventListener("DOMContentLoaded", function() {
         const isOpen = navbar.classList.contains("menu-open");
         toggleButton.setAttribute("aria-expanded", String(isOpen));
         toggleIcon.textContent = isOpen ? "✕" : "☰";
-    });
-
-    const currentPath = window.location.pathname;
-    navlinks.forEach(function(link) {
-        if (link.pathname === currentPath) {
-            link.classList.add("active");
-        }
     });
 });
 </script>

@@ -37,11 +37,7 @@ app.use((req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-    res.render("home");
-});
-
-app.get("/risk", (req, res) => {
-    res.render("TaapSurakshak/risk", {
+    res.render("BeyondSentinel/risk", {
         userName: "Beyond"
     });
 });
