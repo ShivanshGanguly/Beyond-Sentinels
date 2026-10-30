@@ -23,7 +23,6 @@
             max-width: 100%;
             padding: 10px;
             border-radius: 8px;
-            border: 1px solid #ccc;
         }
 
         .metric-card {
@@ -55,7 +54,7 @@
         }
 
         #mumbaiHeatmap {
-            height: 780px;
+            height: 550px;
             width: 100%;
         }
 
@@ -129,66 +128,15 @@
                 </div>
 
             </div>
-
         </div>
     </div>
 
     <script>
         const wardSelect = document.getElementById("wardSelect");
 
+        let wardPredictions = [];
+
         async function loadWards() {
-            try {
-                const response = await fetch("/api/wards");
-
-                if (!response.ok) {
-                    throw new Error("Unable to load wards");
-                }
-
-                const data = await response.json();
-
-                const wards = Array.isArray(data)
-                    ? data
-                    : data.wards || data.data || [];
-
-                wardSelect.innerHTML = "";
-
-                wards.forEach(ward => {
-                    const id = ward.wardID ?? ward.ward_id ?? ward.id;
-                    const name = ward.wardName ?? ward.ward_name ?? ward.name;
-
-                    if (id == null) return;
-
-                    const option = document.createElement("option");
-                    option.value = id;
-                    option.textContent = name || `Ward ${id}`;
-
-                    wardSelect.appendChild(option);
-                });
-
-                if (!wards.length) {
-                    wardSelect.innerHTML =
-                        '<option value="">No wards available</option>';
-                    return;
-                }
-
-                loadWardPrediction();
-
-            } catch (error) {
-                console.error("Ward loading error:", error);
-                wardSelect.innerHTML =
-                    '<option value="">Failed to load wards</option>';
-            }
-        }
-
-        async function loadWardPrediction() {
-            const wardID = wardSelect.value;
-
-            if (!wardID) return;
-
-            document.getElementById("wbgtValue").textContent = "Loading...";
-            document.getElementById("hmriValue").textContent = "Loading...";
-            document.getElementById("riskLevel").textContent = "Loading...";
-
             try {
                 const response = await fetch("/api/predict/wards", {
                     method: "POST",
@@ -197,70 +145,92 @@
                         "Accept": "application/json"
                     },
                     body: JSON.stringify({
-                        wardID: Number(wardID)
+                        temp_mean_c: 35,
+                        temp_max_c: 40,
+                        temp_min_c: 30,
+                        humidity_pct: 60,
+                        wind_speed_ms: 2,
+                        solar_radiation_kwh_m2: 5
                     })
                 });
 
                 if (!response.ok) {
-                    throw new Error("Ward prediction failed");
+                    throw new Error("Unable to load ward predictions");
                 }
 
                 const data = await response.json();
 
-                console.log("Selected ward prediction:", data);
+                wardPredictions = Array.isArray(data) ? data : [];
 
-                console.log("FULL WARD API RESPONSE:", data);
+                wardSelect.innerHTML = "";
 
-                const prediction =
-                    data["3d"] ||
-                    data["3_day"] ||
-                    data.predictions?.["3d"] ||
-                    data.prediction ||
-                    data;
+                wardPredictions.forEach(ward => {
+                    const option = document.createElement("option");
 
-                const wbgtValue =
-                    prediction.wbgt_c ??
-                    prediction.wbgt ??
-                    prediction.WBGT ??
-                    data.heatStress;
+                    option.value = ward.ward_id;
+                    option.textContent = ward.ward_name;
 
-                const hmriValue =
-                    prediction.hmri ??
-                    prediction.HMRI ??
-                    prediction.hmri_value ??
-                    data.mortalityRisk;
+                    wardSelect.appendChild(option);
+                });
 
-                const riskValue =
-                    prediction.risk_level ??
-                    prediction.riskLevel ??
-                    prediction.risk ??
-                    prediction.level ??
-                    data.riskLevel;
+                if (wardPredictions.length === 0) {
+                    wardSelect.innerHTML =
+                        '<option value="">No wards available</option>';
+                    return;
+                }
 
-                const wbgt = Number(wbgtValue);
-                const hmri = Number(hmriValue);
-
-                const risk = riskValue;
-
-                document.getElementById("wbgtValue").textContent =
-                    Number.isFinite(wbgt) ? wbgt.toFixed(2) + "°C" : "Unavailable";
-
-                document.getElementById("hmriValue").textContent =
-                    Number.isFinite(hmri) ? hmri.toFixed(2) : "Unavailable";
-
-                document.getElementById("riskLevel").textContent =
-                    risk || "Unavailable";
+                updateWardMetrics();
 
             } catch (error) {
-                console.error("Ward prediction error:", error);
+                console.error("Ward loading error:", error);
 
-                document.getElementById("wbgtValue").textContent = "Error";
-                document.getElementById("hmriValue").textContent = "Error";
-                document.getElementById("riskLevel").textContent = "Unavailable";
+                wardSelect.innerHTML =
+                    '<option value="">Failed to load wards</option>';
+
+                showError();
             }
         }
 
-        wardSelect.addEventListener("change", loadWardPrediction);
+        function updateWardMetrics() {
+            const wardID = Number(wardSelect.value);
+
+            const selectedWard = wardPredictions.find(
+                ward => ward.ward_id === wardID
+            );
+
+            if (!selectedWard) {
+                showError();
+                return;
+            }
+
+            const prediction = selectedWard.prediction?.["3d"];
+
+            if (!prediction) {
+                showError();
+                return;
+            }
+
+            const wbgt = Number(prediction.wbgt_c);
+            const hmri = Number(prediction.hmri);
+            const risk = prediction.risk_level;
+
+            document.getElementById("wbgtValue").textContent =
+                Number.isFinite(wbgt) ? wbgt.toFixed(2) + "°C" : "Unavailable";
+
+            document.getElementById("hmriValue").textContent =
+                Number.isFinite(hmri) ? hmri.toFixed(2) : "Unavailable";
+
+            document.getElementById("riskLevel").textContent =
+                risk || "Unavailable";
+        }
+
+        function showError() {
+            document.getElementById("wbgtValue").textContent = "Unavailable";
+            document.getElementById("hmriValue").textContent = "Unavailable";
+            document.getElementById("riskLevel").textContent = "Unavailable";
+        }
+
+        wardSelect.addEventListener("change", updateWardMetrics);
 
         document.addEventListener("DOMContentLoaded", loadWards);
 
