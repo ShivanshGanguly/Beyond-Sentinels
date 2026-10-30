@@ -1,0 +1,70 @@
+forecast_date,ward_id,action_key,action_label,quantity,unit_cost_inr,total_cost_inr,status
+2026-11-04,1,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-04,1,shade_station,shaded rest stations,1,250000,250000,completed
+2026-11-04,2,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-04,2,shade_station,shaded rest stations,1,250000,250000,completed
+2026-11-04,2,greenery,shade-tree/greenery packages,1,150000,150000,completed
+2026-11-04,2,cool_roof,cool-roof packages,1,200000,200000,completed
+2026-11-04,3,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-04,3,shade_station,shaded rest stations,1,250000,250000,completed
+2026-11-04,3,greenery,shade-tree/greenery packages,1,150000,150000,completed
+2026-11-04,3,cool_roof,cool-roof packages,1,200000,200000,completed
+2026-11-04,3,cooling_centre,cooling-centre support units,1,500000,500000,completed
+2026-11-04,4,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-04,5,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-04,5,shade_station,shaded rest stations,1,250000,250000,completed
+2026-11-04,5,cool_roof,cool-roof packages,1,200000,200000,completed
+2026-11-04,7,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-04,7,shade_station,shaded rest stations,1,250000,250000,completed
+2026-11-04,6,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-04,9,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-04,9,shade_station,shaded rest stations,1,250000,250000,completed
+2026-11-04,9,cool_roof,cool-roof packages,1,200000,200000,completed
+2026-11-04,8,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-04,8,shade_station,shaded rest stations,1,250000,250000,completed
+2026-11-04,8,cool_roof,cool-roof packages,1,200000,200000,completed
+2026-11-04,11,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-04,14,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-04,16,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-04,16,shade_station,shaded rest stations,1,250000,250000,completed
+2026-11-04,1,cool_roof,cool-roof packages,1,200000,200000,completed
+2026-11-04,2,cooling_centre,cooling-centre support units,1,500000,500000,completed
+2026-11-04,5,cooling_centre,cooling-centre support units,1,500000,500000,completed
+2026-11-04,5,greenery,shade-tree/greenery packages,1,150000,150000,completed
+2026-11-04,7,cool_roof,cool-roof packages,1,200000,200000,completed
+2026-11-04,7,cooling_centre,cooling-centre support units,1,500000,500000,completed
+2026-11-04,6,shade_station,shaded rest stations,1,250000,250000,completed
+2026-11-04,6,cool_roof,cool-roof packages,1,200000,200000,completed
+2026-11-04,9,cooling_centre,cooling-centre support units,1,500000,500000,completed
+2026-11-04,8,cooling_centre,cooling-centre support units,1,500000,500000,completed
+2026-11-04,10,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-04,14,shade_station,shaded rest stations,1,250000,250000,completed
+2026-11-04,14,greenery,shade-tree/greenery packages,1,150000,150000,completed
+2026-11-04,14,cool_roof,cool-roof packages,1,200000,200000,completed
+2026-11-04,16,cool_roof,cool-roof packages,1,200000,200000,completed
+2026-11-04,15,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-04,19,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-04,18,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-04,21,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-04,22,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-04,20,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-05,1,cooling_centre,cooling-centre support units,1,500000,500000,completed
+2026-11-05,4,shade_station,shaded rest stations,1,250000,250000,completed
+2026-11-05,4,cool_roof,cool-roof packages,1,200000,200000,completed
+2026-11-05,11,shade_station,shaded rest stations,1,250000,250000,completed
+2026-11-05,11,cool_roof,cool-roof packages,1,200000,200000,completed
+2026-11-05,10,shade_station,shaded rest stations,1,250000,250000,completed
+2026-11-05,10,cool_roof,cool-roof packages,1,200000,200000,completed
+2026-11-05,13,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-05,12,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-05,12,shade_station,shaded rest stations,1,250000,250000,completed
+2026-11-05,14,cooling_centre,cooling-centre support units,1,500000,500000,completed
+2026-11-05,16,cooling_centre,cooling-centre support units,1,500000,500000,completed
+2026-11-05,15,shade_station,shaded rest stations,1,250000,250000,completed
+2026-11-05,17,water_kiosk,water kiosks,1,100000,100000,completed
+2026-11-05,21,shade_station,shaded rest stations,1,250000,250000,completed
+2026-11-05,21,cool_roof,cool-roof packages,1,200000,200000,completed
+2026-11-05,22,shade_station,shaded rest stations,1,250000,250000,completed
+2026-11-05,22,cool_roof,cool-roof packages,1,200000,200000,completed
+2026-11-05,20,shade_station,shaded rest stations,1,250000,250000,completed
+2026-11-05,20,cool_roof,cool-roof packages,1,200000,200000,completed
