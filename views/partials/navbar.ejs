@@ -1,137 +1,155 @@
 
 <style>
+#mainNavbar {
+    width: 100%;
+    min-height: 75px;
+    background-color: #d3c9c9;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 10px 25px;
+    position: relative;
+    z-index: 1030;
+}
+#mainNavbar .container-fluid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+#mainNavbar .navbar-brand {
+    color: #dc3545;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    margin: 0;
+}
+#mainNavbar .navbar-nav {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    margin: 0 auto;
+}
+#mainNavbar .nav-link {
+    color: #071b3a;
+    font-size: 1.05rem;
+    font-weight: 500;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+#mainNavbar .nav-link:hover,
+#mainNavbar .nav-link.active {
+    background-color: #fd0000;
+    color: #ffffff !important;
+}
+#mainNavbar .user-section {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+#mainNavbar .navbar-text {
+    color: #071b3a;
+    font-size: 1rem;
+    font-weight: 700;
+    white-space: nowrap;
+    margin: 0;
+}
+#sidebarToggle {
+    display: none;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: white;
+    color: #071b3a;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+}
+#sidebarToggle:hover {
+    background-color: #de4343;
+    color: white;
+}
+.main-content,
+.main-content.sidebar-collapsed {
+    margin-left: 0;
+}
+@media(max-width:991px) {
     #mainNavbar {
-        width: 100%;
-        background-color: #d3c9c9;
-        border-bottom: 1px solid #e5e7eb;
-        padding: 10px 20px;
+        padding: 12px 16px;
     }
-
     #mainNavbar .container-fluid {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
     }
-
+    #sidebarToggle {
+        display: flex;
+        order: 3;
+        margin-left: auto;
+    }
     #mainNavbar .navbar-brand {
-        color: #071b3a;
-        font-size: 1.5rem;
-        font-weight: 700;
-        text-decoration: none;
-        white-space: nowrap;
-        margin: 0;
+        font-size: 1.4rem;
     }
-
     #mainNavbar .navbar-nav {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 8px;
-        margin: 0;
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        order: 4;
+        gap: 5px;
+        margin: 10px 0 0;
     }
-
+    #mainNavbar.menu-open .navbar-nav {
+        display: flex;
+    }
     #mainNavbar .nav-link {
-        color: #071b3a;
-        font-size: 1.05rem;
-        padding: 10px 15px;
-        border-radius: 8px;
-        text-decoration: none;
-        white-space: nowrap;
-        transition: background-color 0.3s ease, color 0.3s ease;
+        width: 100%;
+        padding: 11px 15px;
     }
-
-    #mainNavbar .nav-link:hover,
-    #mainNavbar .nav-link.active {
-        background-color: #fd0000;
-        color: #ffffff !important;
-    }
-
     #mainNavbar .user-section {
+        display: none;
+        width: 100%;
+        order: 5;
+        margin: 5px 0 0;
+        padding: 12px 15px;
+        border-top: 1px solid #e5e7eb;
+    }
+    #mainNavbar.menu-open .user-section {
         display: flex;
-        align-items: center;
-        margin: 0;
-        padding: 0;
     }
-
-    #mainNavbar .navbar-text {
-        color: #071b3a;
-        font-size: 1rem;
-        font-weight: 600;
-        white-space: nowrap;
-        margin: 0;
+}
+@media(max-width:575px) {
+    #mainNavbar {
+        padding: 10px 12px;
     }
-
-    @media (max-width: 767px) {
-        #mainNavbar {
-            padding: 12px 14px;
-        }
-
-        #mainNavbar .container-fluid {
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        #mainNavbar .navbar-brand {
-            font-size: 1.3rem;
-        }
-
-        #mainNavbar .navbar-nav {
-            width: 100%;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 4px;
-        }
-
-        #mainNavbar .nav-link {
-            font-size: 0.95rem;
-            padding: 8px 10px;
-        }
-
-        #mainNavbar .user-section {
-            width: 100%;
-            justify-content: center;
-        }
-
-        #mainNavbar .navbar-text {
-            font-size: 0.9rem;
-        }
+    #mainNavbar .navbar-brand {
+        font-size: 1.15rem;
     }
-
-    @media (max-width: 575px) {
-        #mainNavbar .container-fluid {
-            justify-content: center;
-        }
-
-        #mainNavbar .navbar-brand {
-            width: 100%;
-            text-align: center;
-            font-size: 1.2rem;
-        }
-
-        #mainNavbar .navbar-nav {
-            gap: 2px;
-        }
-
-        #mainNavbar .nav-link {
-            font-size: 0.9rem;
-            padding: 8px;
-        }
+    #sidebarToggle {
+        width: 36px;
+        height: 36px;
     }
+    #mainNavbar .nav-link {
+        font-size: 0.95rem;
+        padding: 10px 12px;
+    }
+}
 </style>
 
 <nav id="mainNavbar" class="navbar">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-            HeatAwareness
-        </a>
-
+        <a class="navbar-brand" href="/">TaapSurakshak</a>
+        <button id="sidebarToggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
+            <span id="toggleIcon">☰</span>
+        </button>
         <div class="navbar-nav">
-            <a class="nav-link" href="/risk">Risk Map</a>
-            <a class="nav-link" href="">Rank</a>
-            <a class="nav-link" href="">Spend</a>
+            <a class="nav-link" href="/risk">Heatmap</a>
+            <a class="nav-link" href="/predict">Intervene</a>
+            <a class="nav-link" href="/alerts">Comparision</a>
         </div>
-
         <div class="user-section">
             <span class="navbar-text">Welcome, Beyond</span>
         </div>
@@ -139,16 +157,24 @@
 </nav>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const navlinks = document.querySelectorAll("#mainNavbar .nav-link");
-        const currentUrl = window.location.pathname;
+document.addEventListener("DOMContentLoaded", function() {
+    const navbar = document.getElementById("mainNavbar");
+    const toggleButton = document.getElementById("sidebarToggle");
+    const toggleIcon = document.getElementById("toggleIcon");
+    const navlinks = document.querySelectorAll("#mainNavbar .nav-link");
 
-        navlinks.forEach(function (link) {
-            const linkUrl = new URL(link.href, window.location.origin).pathname;
-
-            if (linkUrl === currentUrl && link.getAttribute("href") !== "") {
-                link.classList.add("active");
-            }
-        });
+    toggleButton.addEventListener("click", function() {
+        navbar.classList.toggle("menu-open");
+        const isOpen = navbar.classList.contains("menu-open");
+        toggleButton.setAttribute("aria-expanded", String(isOpen));
+        toggleIcon.textContent = isOpen ? "✕" : "☰";
     });
+
+    const currentPath = window.location.pathname;
+    navlinks.forEach(function(link) {
+        if (link.pathname === currentPath) {
+            link.classList.add("active");
+        }
+    });
+});
 </script>

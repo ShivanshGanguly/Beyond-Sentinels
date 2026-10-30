@@ -1,0 +1,119 @@
+
+<% layout("layouts/boilerplate.ejs") %>
+
+<style>
+.dashboard {
+    padding: 25px;
+}
+.metric-card {
+    border-radius: 12px;
+    padding: 25px;
+    min-height: 180px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+}
+.metric-card h5 {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+.metric-card h1 {
+    font-size: clamp(2rem,5vw,3rem);
+    font-weight: 700;
+}
+.heatmap-card {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 25px;
+}
+#mumbaiHeatmap {
+    height: 600px;
+    width: 100%;
+}
+@media(max-width:767px) {
+    .dashboard {
+        padding: 12px;
+    }
+    #mumbaiHeatmap {
+        height: 450px;
+    }
+}
+</style>
+
+<div class="container-fluid dashboard">
+    <div class="row g-4">
+        <div class="col-12 col-md-4">
+            <div class="metric-card bg-danger-subtle text-danger">
+                <h5>WBGT</h5>
+                <h1 id="wbgtValue">Loading...</h1>
+                <p>Wet Bulb Globe Temperature</p>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="metric-card bg-warning-subtle text-dark">
+                <h5>HMRI</h5>
+                <h1 id="hmriValue">Loading...</h1>
+                <p>Heat Mortality Risk Index</p>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="metric-card bg-success-subtle text-dark">
+                <h5>Risk Level</h5>
+                <h1 id="riskLevel">Loading...</h1>
+                <p>Predicted Heat Risk</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card heatmap-card">
+        <div id="mumbaiHeatmap"></div>
+    </div>
+</div>
+
+<script>
+async function loadHeatRiskData() {
+    try {
+        const response = await fetch("/api/latest-heat-data");
+
+        if (!response.ok) {
+            throw new Error("Backend connection failed");
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.message || "Data unavailable");
+        }
+
+        document.getElementById("wbgtValue").textContent =
+            Number(data.heatStress).toFixed(2) + "°C";
+
+        document.getElementById("hmriValue").textContent =
+            Number(data.mortalityRisk).toFixed(2);
+
+        document.getElementById("riskLevel").textContent =
+            data.riskLevel || "Unavailable";
+
+    } catch (error) {
+        console.error(error);
+        document.getElementById("wbgtValue").textContent = "Error";
+        document.getElementById("hmriValue").textContent = "Error";
+        document.getElementById("riskLevel").textContent = "Unavailable";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", loadHeatRiskData);
+
+window.addEventListener("load", function() {
+    setTimeout(function() {
+        if (typeof map !== "undefined" && map) {
+            map.invalidateSize();
+        }
+    }, 500);
+});
+
+window.addEventListener("resize", function() {
+    if (typeof map !== "undefined" && map) {
+        map.invalidateSize();
+    }
+});
+</script>

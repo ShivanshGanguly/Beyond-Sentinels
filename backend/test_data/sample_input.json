@@ -1,0 +1,18 @@
+{
+  "temp_mean_c": 34.5,
+  "temp_max_c": 38.2,
+  "temp_min_c": 28.1,
+  "humidity_pct": 65.0,
+  "wind_speed_ms": 2.5,
+  "solar_radiation_kwh_m2": 5.8,
+  "heat_index_c": 42.0,
+  "wbgt_c": 31.5,
+  "utci_c": 39.0,
+  "temperature_anomaly_c": 2.1,
+  "temp_lag_1d": 34.0,
+  "temp_lag_3d": 33.2,
+  "temp_lag_7d": 32.8,
+  "humidity_lag_1d": 64.0,
+  "humidity_lag_3d": 63.5,
+  "humidity_lag_7d": 62.0
+}

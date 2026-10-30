@@ -1,1 +1,25 @@
+# Node dependencies
 node_modules/
+
+# Environment variables
+.env
+.env.*
+
+# Logs
+*.log
+logs/
+
+# WhatsApp Web session data
+.wwebjs_auth/
+.wwebjs_auth_new/
+.wwebjs_cache/
+
+# Puppeteer cache
+.cache/
+
+# Python
+backend/venv/
+venv/
+.venv/
+__pycache__/
+*.pyc
