@@ -1,83 +1,312 @@
 <% layout("layouts/boilerplate.ejs") %>
 
     <style>
+        :root {
+            --navy: #102653;
+            --blue: #2563eb;
+            --red: #e8485b;
+            --orange: #f59e0b;
+            --green: #0f9f83;
+            --light-bg: #f5f8ff;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            background: #f5f7fc;
+        }
+
         .dashboard {
-            padding: 15px;
+            padding: 18px;
+            color: var(--navy);
         }
 
         .dashboard-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 15px;
+            gap: 20px;
             flex-wrap: wrap;
-            margin-bottom: 15px;
+            padding: 22px 26px;
+            margin-bottom: 22px;
+            border-radius: 18px;
+            background: linear-gradient(110deg, #fff0f2, #f1f5ff, #fff1f2);
+            border: 1px solid #f3e1e5;
+            box-shadow: 0 5px 18px rgba(16, 38, 83, 0.05);
         }
 
         .dashboard-header h1 {
             margin: 0;
+            color: var(--navy);
+            font-size: clamp(1.7rem, 3vw, 2.5rem);
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .ward-select-wrapper {
+            min-width: 240px;
+        }
+
+        .ward-select-wrapper label {
+            color: var(--navy);
+            font-size: 0.9rem;
+            margin-bottom: 7px;
         }
 
         .ward-select {
-            width: 240px;
-            max-width: 100%;
-            padding: 10px;
-            border-radius: 8px;
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid #d8e0ef;
+            border-radius: 10px;
+            background-color: #fff;
+            color: var(--navy);
+            font-weight: 500;
+            box-shadow: 0 2px 6px rgba(16, 38, 83, 0.04);
         }
 
-        .metric-card {
-            border-radius: 12px;
-            padding: 20px;
-            min-height: 175px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .metric-card h5 {
-            font-size: 1rem;
-            margin-bottom: 18px;
-        }
-
-        .metric-card h1 {
-            font-size: clamp(1.7rem, 3vw, 2.6rem);
-            font-weight: 700;
-            overflow-wrap: anywhere;
+        .ward-select:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
         }
 
         .heatmap-card {
             width: 100%;
-            border-radius: 12px;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            background: #fff;
+            box-shadow: 0 5px 20px rgba(16, 38, 83, 0.06);
             overflow: hidden;
-            margin: 0;
         }
 
         #mumbaiHeatmap {
             height: 550px;
             width: 100%;
+            border-radius: 12px;
+            z-index: 1;
         }
 
-        @media(max-width:991px) {
+        .metric-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 170px;
+            padding: 22px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 5px 16px rgba(16, 38, 83, 0.06);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 9px 22px rgba(16, 38, 83, 0.1);
+        }
+
+        .metric-card h5 {
+            font-size: 0.98rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+
+        .metric-card h1 {
+            font-size: clamp(1.8rem, 3vw, 2.5rem);
+            font-weight: 800;
+            margin: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .metric-card.bg-danger-subtle {
+            background: linear-gradient(135deg, #fff0f1, #fffafa);
+            color: #a51e35;
+            border: 1px solid #ffb8c1 !important;
+        }
+
+        .metric-card.bg-warning-subtle {
+            background: linear-gradient(135deg, #fff7e8, #fffdfa);
+            color: #a34a0a;
+            border: 1px solid #ffd38b !important;
+        }
+
+        .metric-card.bg-info-subtle {
+            background: linear-gradient(135deg, #eaf5ff, #f8fbff);
+            color: #16449a;
+            border: 1px solid #9bd0ff !important;
+        }
+
+        #intervene {
+            margin-top: 24px;
+            padding: 24px;
+            border-radius: 18px;
+            background: linear-gradient(120deg, #eff7ff, #ffffff);
+            border: 1px solid #dceafa;
+            box-shadow: 0 5px 18px rgba(16, 38, 83, 0.04);
+        }
+
+        #intervene>h1 {
+            color: var(--navy);
+            font-size: clamp(1.8rem, 3vw, 2.4rem);
+            font-weight: 800;
+            margin-bottom: 22px;
+        }
+
+        #intervene h3 {
+            color: var(--navy);
+            font-size: 1.35rem;
+            font-weight: 750;
+            margin-bottom: 18px;
+        }
+
+        .table-responsive {
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+
+        .table {
+            margin-bottom: 0;
+            vertical-align: middle;
+            background: #fff;
+            border-color: var(--border);
+        }
+
+        .table thead th {
+            padding: 15px 17px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .table tbody td {
+            padding: 14px 17px;
+            color: #475569;
+            font-size: 0.92rem;
+        }
+
+        #wardPriorityTable thead {
+            background: var(--red);
+            color: #fff;
+        }
+
+        #wardPriorityTable thead th {
+            background: var(--red);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .table tbody tr:hover {
+            background: #f3f7ff;
+        }
+
+        .budget-section {
+            margin: 26px 0;
+            padding: 0;
+            border: 1px solid #cceee5;
+            border-radius: 18px;
+            background: linear-gradient(145deg, #f1fffb, #ffffff 45%);
+            box-shadow: 0 5px 20px rgba(15, 159, 131, 0.06);
+            overflow: hidden;
+        }
+
+        .budget-header {
+            padding: 24px 26px;
+            background: linear-gradient(110deg, #e4f8f2, #f1fbff);
+            border-bottom: 1px solid #d6eee8;
+        }
+
+        .budget-header h2 {
+            color: #103b4b;
+            font-size: clamp(1.5rem, 3vw, 2.1rem);
+            font-weight: 800;
+            margin-bottom: 9px;
+        }
+
+        .budget-header p {
+            color: #426777;
+            margin: 0;
+            font-size: 0.98rem;
+        }
+
+        .budget-content {
+            padding: 22px;
+        }
+
+        .budget-card {
+            height: 100%;
+            padding: 22px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #dff9ef, #f0fffa);
+            border: 1px solid #83d9bc;
+            box-shadow: 0 4px 14px rgba(15, 159, 131, 0.08);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .budget-card strong {
+            color: #12634f;
+            font-size: 1rem;
+        }
+
+        .budget-card h2 {
+            color: #075c4c;
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            font-weight: 800;
+            margin-top: 12px;
+        }
+
+        .budget-content h4 {
+            color: var(--navy);
+            font-size: 1.15rem;
+            font-weight: 750;
+            margin-bottom: 14px;
+        }
+
+        #interventionMenu thead th {
+            background: #167d78;
+            color: #fff;
+        }
+
+        #recommendedPlan thead th,
+        .budget-content .table-dark th {
+            background: #294d78;
+            color: #fff;
+        }
+
+        #budgetSummary {
+            padding: 18px;
+            border: 1px solid #b8dcff;
+            border-radius: 12px;
+            background: #eff7ff;
+            color: #164b87;
+            line-height: 1.9;
+        }
+
+        #budgetSummary h4 {
+            margin-top: 6px;
+        }
+
+        @media (max-width: 991px) {
             #mumbaiHeatmap {
                 height: 600px;
             }
 
             .metric-card {
-                min-height: 140px;
+                min-height: 145px;
             }
         }
 
-        @media(max-width:767px) {
+        @media (max-width: 767px) {
             .dashboard {
-                padding: 8px;
+                padding: 9px;
             }
 
             .dashboard-header {
-                align-items: stretch;
+                padding: 18px;
             }
 
-            .ward-select {
+            .ward-select-wrapper {
                 width: 100%;
             }
 
@@ -86,24 +315,43 @@
             }
 
             .metric-card {
-                min-height: 120px;
+                min-height: 125px;
+                padding: 17px;
+            }
+
+            #intervene {
                 padding: 15px;
+            }
+
+            .budget-content {
+                padding: 14px;
+            }
+
+            .budget-header {
+                padding: 19px;
+            }
+
+            .table thead th,
+            .table tbody td {
+                padding: 11px;
+                font-size: 0.82rem;
             }
         }
     </style>
 
     <div class="container-fluid dashboard" id="risk">
-
         <div class="dashboard-header">
             <h1 class="heading-1 fw-bold">Risk Heatmap</h1>
 
-            <select id="wardSelect" class="form-select ward-select">
-                <option value="">Loading wards...</option>
-            </select>
+            <div class="ward-select-wrapper">
+                <label for="wardSelect" class="form-label fw-bold">Select Ward:</label>
+                <select id="wardSelect" class="form-select ward-select">
+                    <option value="">Loading wards...</option>
+                </select>
+            </div>
         </div>
 
         <div class="row g-3">
-
             <div class="col-12 col-lg-9">
                 <div class="card heatmap-card">
                     <div id="mumbaiHeatmap"></div>
@@ -111,7 +359,6 @@
             </div>
 
             <div class="col-12 col-lg-3">
-
                 <div class="card metric-card bg-danger-subtle border-danger">
                     <h5>Wet Bulb Globe Temperature (WBGT)</h5>
                     <h1 id="wbgtValue">Loading...</h1>
@@ -126,125 +373,116 @@
                     <h5>Risk Level</h5>
                     <h1 id="riskLevel">Loading...</h1>
                 </div>
-
             </div>
         </div>
     </div>
 
-    <script>
-        const wardSelect = document.getElementById("wardSelect");
+    <div class="container-fluid" id="intervene">
+        <h1 class="heading-1 fw-bold">Intervene</h1>
+        <h3>Ward Priority Ranking</h3>
 
-        let wardPredictions = [];
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="wardPriorityTable">
+                <thead>
+                    <tr>
+                        <th>Priority</th>
+                        <th>Ward</th>
+                        <th>HMRI</th>
+                        <th>WBGT</th>
+                        <th>Risk Level</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="5">Loading ward priorities...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-        async function loadWards() {
-            try {
-                const response = await fetch("/api/predict/wards", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json"
-                    },
-                    body: JSON.stringify({
-                        temp_mean_c: 35,
-                        temp_max_c: 40,
-                        temp_min_c: 30,
-                        humidity_pct: 60,
-                        wind_speed_ms: 2,
-                        solar_radiation_kwh_m2: 5
-                    })
-                });
+    <section class="container-fluid budget-section">
+        <div class="budget-header">
+            <h2>Cool Block Commander: Budget Planner</h2>
+            <p>Allocate the fixed budget of ₹50 lakh to reduce heat vulnerability across Mumbai wards.</p>
+        </div>
 
-                if (!response.ok) {
-                    throw new Error("Unable to load ward predictions");
-                }
+        <div class="budget-content">
+            <div class="row g-4 align-items-stretch mb-4">
+                <div class="col-12 col-md-4">
+                    <div class="budget-card">
+                        <strong>Available Budget</strong>
+                        <h2 class="mb-0">₹50 Lakh</h2>
+                    </div>
+                </div>
 
-                const data = await response.json();
+                <div class="col-12 col-md-8">
+                    <h4>Intervention Menu and Assumptions</h4>
 
-                wardPredictions = Array.isArray(data) ? data : [];
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Intervention</th>
+                                    <th>Cost per Ward Package</th>
+                                    <th>Assumed Vulnerability Reduction</th>
+                                </tr>
+                            </thead>
+                            <tbody id="interventionMenu"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-                wardSelect.innerHTML = "";
+            <h4>Recommended Spending Plan</h4>
 
-                wardPredictions.forEach(ward => {
-                    const option = document.createElement("option");
+            <div id="budgetSummary" class="alert alert-info">
+                Generating budget plan...
+            </div>
 
-                    option.value = ward.ward_id;
-                    option.textContent = ward.ward_name;
+            <div class="table-responsive mb-4">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Ward</th>
+                            <th>Intervention</th>
+                            <th>Estimated Cost</th>
+                            <th>Estimated Vulnerability Reduction</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recommendedPlan">
+                        <tr>
+                            <td colspan="4">Loading recommendations...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="comparision">
+                <h4>Before and After: Ward Vulnerability</h4>
 
-                    wardSelect.appendChild(option);
-                });
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Ward</th>
+                                <th>Priority</th>
+                                <th>Before</th>
+                                <th>After</th>
+                                <th>Reduction</th>
+                            </tr>
+                        </thead>
+                        <tbody id="beforeAfterTable">
+                            <tr>
+                                <td colspan="5">Loading comparison...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-                if (wardPredictions.length === 0) {
-                    wardSelect.innerHTML =
-                        '<option value="">No wards available</option>';
-                    return;
-                }
+        </div>
+    </section>
 
-                updateWardMetrics();
-
-            } catch (error) {
-                console.error("Ward loading error:", error);
-
-                wardSelect.innerHTML =
-                    '<option value="">Failed to load wards</option>';
-
-                showError();
-            }
-        }
-
-        function updateWardMetrics() {
-            const wardID = Number(wardSelect.value);
-
-            const selectedWard = wardPredictions.find(
-                ward => ward.ward_id === wardID
-            );
-
-            if (!selectedWard) {
-                showError();
-                return;
-            }
-
-            const prediction = selectedWard.prediction?.["3d"];
-
-            if (!prediction) {
-                showError();
-                return;
-            }
-
-            const wbgt = Number(prediction.wbgt_c);
-            const hmri = Number(prediction.hmri);
-            const risk = prediction.risk_level;
-
-            document.getElementById("wbgtValue").textContent =
-                Number.isFinite(wbgt) ? wbgt.toFixed(2) + "°C" : "Unavailable";
-
-            document.getElementById("hmriValue").textContent =
-                Number.isFinite(hmri) ? hmri.toFixed(2) : "Unavailable";
-
-            document.getElementById("riskLevel").textContent =
-                risk || "Unavailable";
-        }
-
-        function showError() {
-            document.getElementById("wbgtValue").textContent = "Unavailable";
-            document.getElementById("hmriValue").textContent = "Unavailable";
-            document.getElementById("riskLevel").textContent = "Unavailable";
-        }
-
-        wardSelect.addEventListener("change", updateWardMetrics);
-
-        document.addEventListener("DOMContentLoaded", loadWards);
-
-        window.addEventListener("load", function () {
-            setTimeout(function () {
-                if (typeof map !== "undefined" && map) {
-                    map.invalidateSize();
-                }
-            }, 500);
-        });
-
-        window.addEventListener("resize", function () {
-            if (typeof map !== "undefined" && map) {
-                map.invalidateSize();
-            }
-        });
-    </script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/public/js/dashboard.js" defer></script>
