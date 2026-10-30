@@ -1,0 +1,154 @@
+
+<style>
+    #mainNavbar {
+        width: 100%;
+        background-color: #d3c9c9;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 10px 20px;
+    }
+
+    #mainNavbar .container-fluid {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    #mainNavbar .navbar-brand {
+        color: #071b3a;
+        font-size: 1.5rem;
+        font-weight: 700;
+        text-decoration: none;
+        white-space: nowrap;
+        margin: 0;
+    }
+
+    #mainNavbar .navbar-nav {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+    }
+
+    #mainNavbar .nav-link {
+        color: #071b3a;
+        font-size: 1.05rem;
+        padding: 10px 15px;
+        border-radius: 8px;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    #mainNavbar .nav-link:hover,
+    #mainNavbar .nav-link.active {
+        background-color: #fd0000;
+        color: #ffffff !important;
+    }
+
+    #mainNavbar .user-section {
+        display: flex;
+        align-items: center;
+        margin: 0;
+        padding: 0;
+    }
+
+    #mainNavbar .navbar-text {
+        color: #071b3a;
+        font-size: 1rem;
+        font-weight: 600;
+        white-space: nowrap;
+        margin: 0;
+    }
+
+    @media (max-width: 767px) {
+        #mainNavbar {
+            padding: 12px 14px;
+        }
+
+        #mainNavbar .container-fluid {
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        #mainNavbar .navbar-brand {
+            font-size: 1.3rem;
+        }
+
+        #mainNavbar .navbar-nav {
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        #mainNavbar .nav-link {
+            font-size: 0.95rem;
+            padding: 8px 10px;
+        }
+
+        #mainNavbar .user-section {
+            width: 100%;
+            justify-content: center;
+        }
+
+        #mainNavbar .navbar-text {
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 575px) {
+        #mainNavbar .container-fluid {
+            justify-content: center;
+        }
+
+        #mainNavbar .navbar-brand {
+            width: 100%;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        #mainNavbar .navbar-nav {
+            gap: 2px;
+        }
+
+        #mainNavbar .nav-link {
+            font-size: 0.9rem;
+            padding: 8px;
+        }
+    }
+</style>
+
+<nav id="mainNavbar" class="navbar">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            HeatAwareness
+        </a>
+
+        <div class="navbar-nav">
+            <a class="nav-link" href="/risk">Risk Map</a>
+            <a class="nav-link" href="">Rank</a>
+            <a class="nav-link" href="">Spend</a>
+        </div>
+
+        <div class="user-section">
+            <span class="navbar-text">Welcome, Beyond</span>
+        </div>
+    </div>
+</nav>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const navlinks = document.querySelectorAll("#mainNavbar .nav-link");
+        const currentUrl = window.location.pathname;
+
+        navlinks.forEach(function (link) {
+            const linkUrl = new URL(link.href, window.location.origin).pathname;
+
+            if (linkUrl === currentUrl && link.getAttribute("href") !== "") {
+                link.classList.add("active");
+            }
+        });
+    });
+</script>

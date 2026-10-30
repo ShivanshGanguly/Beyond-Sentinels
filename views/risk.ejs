@@ -1,0 +1,626 @@
+<% layout("layouts/boilerplate.ejs") %>
+
+    <style>
+        /* ==========================================
+       HEATMAP
+    ========================================== */
+
+        #mumbaiHeatmap {
+            height: 700px;
+            width: 100%;
+            border-radius: 5px;
+        }
+
+        .heatmap-card {
+            width: 100%;
+            overflow: hidden;
+        }
+
+
+        /* ==========================================
+       MORTALITY HEADER
+    ========================================== */
+
+        #levelCard .card-body {
+            padding: 1.25rem;
+        }
+
+        #levelCard .row {
+            align-items: center;
+        }
+
+        #levelCard h3 {
+            font-size: clamp(1.2rem, 2vw, 1.75rem);
+            line-height: 1.4;
+        }
+
+        #levelCard p {
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+        }
+
+        #levelCard img {
+            max-width: 100%;
+            height: auto;
+        }
+
+
+        /* ==========================================
+       WBGT CARD
+    ========================================== */
+
+        #wbgtValue {
+            font-size: clamp(2.5rem, 5vw, 60px) !important;
+        }
+
+
+        /* ==========================================
+       TEMPERATURE CARD
+    ========================================== */
+
+        #ambientTemp {
+            font-size: clamp(2rem, 4vw, 40px) !important;
+        }
+
+
+        /* ==========================================
+       TABLET
+    ========================================== */
+
+        @media (max-width: 991px) {
+
+            #mumbaiHeatmap {
+                height: 500px;
+                width: 100%;
+                min-height: 450px;
+            }
+
+            #levelCard .card-body {
+                margin: 0 !important;
+            }
+
+            #levelCard .col-3:first-child {
+                width: 75%;
+            }
+
+            #levelCard .col-3:nth-child(2),
+            #levelCard .col-3:nth-child(3) {
+                display: none;
+            }
+
+            #levelCard .col-3:last-child {
+                width: 25%;
+                text-align: right;
+            }
+
+            .heatmap-card {
+                width: 100%;
+            }
+
+        }
+
+
+        /* ==========================================
+       MOBILE
+    ========================================== */
+
+        @media (max-width: 767px) {
+
+            #levelCard {
+                margin-bottom: 1rem !important;
+            }
+
+            #levelCard .card-body {
+                padding: 1rem !important;
+            }
+
+            #levelCard .col-3:first-child {
+                width: 75%;
+            }
+
+            #levelCard .col-3:last-child {
+                width: 25%;
+            }
+
+            #levelCard img {
+                width: 70px;
+                height: auto;
+            }
+
+            #levelCard h3 {
+                margin-bottom: 0.5rem;
+            }
+
+            .container-fluid {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .card-body.m-3 {
+                margin: 0.75rem !important;
+            }
+
+            #mumbaiHeatmap {
+                height: 450px;
+                width: 100%;
+                min-height: 400px;
+            }
+
+            .heatmap-card {
+                width: 100%;
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+        }
+
+
+        /* ==========================================
+       SMALL MOBILE
+    ========================================== */
+
+        @media (max-width: 575px) {
+
+            #levelCard .col-3:first-child {
+                width: 100%;
+            }
+
+            #levelCard .col-3:last-child {
+                width: 100%;
+                text-align: center;
+                margin-top: 15px;
+            }
+
+            #levelCard img {
+                width: 60px;
+            }
+
+            #levelCard h3 {
+                font-size: 1.15rem;
+            }
+
+            #levelCard p {
+                font-size: 0.85rem;
+            }
+
+            #mumbaiHeatmap {
+                height: 400px;
+                width: 100%;
+                min-height: 350px;
+            }
+
+            .heatmap-card {
+                width: 100%;
+            }
+
+        }
+    </style>
+
+
+    <!-- ==========================================
+     MORTALITY RISK HEADER
+========================================== -->
+
+    <div class="card text-white mb-3" id="levelCard">
+
+        <div class="card-body m-3">
+
+            <div class="row">
+
+                <div class="col-3">
+
+                    <h3 class="card-title">
+
+                        Current Mortality Risk:
+
+                        <span id="mortalityRiskLevel">
+                            Loading...
+                        </span>
+
+                    </h3>
+
+                    <p id="mortalityRiskMessage" class="text-white mb-0">
+                        Loading prediction...
+                    </p>
+
+                </div>
+
+                <div class="col-3"></div>
+
+                <div class="col-3"></div>
+
+                <div class="col-3">
+
+                    <img src="/HeatSentinelIcon.svg" alt="TaapSurakshak Logo" width="100" height="94"
+                        class="d-inline-block flex-end rounded-circle">
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+     MAIN DASHBOARD
+========================================== -->
+
+    <div class="container-fluid px-0">
+
+        <div class="row g-4">
+
+            <!-- ======================================
+             LEFT COLUMN
+        ======================================= -->
+
+            <div class="col-12 col-lg-4">
+
+                <!-- WBGT CARD -->
+
+                <div class="card bg-danger-subtle border border-danger text-danger mb-3">
+
+                    <div class="card-body m-3">
+
+                        <p class="card-title">
+                            Human Thermal Stress Index (WBGT) after 3 days
+                        </p>
+
+                        <h1 id="wbgtValue" class="fw-bolder">
+                            Loading...
+                        </h1>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TEMPERATURE CARD -->
+
+                <div class="card bg-warning-subtle border border-warning mb-3">
+
+                    <div class="card-body m-3">
+
+                        <p class="card-title text-warning">
+                            Peak Ambient Temperature
+                        </p>
+
+                        <h1 class="fw-bold" id="ambientTemp">
+                            Loading...
+                        </h1>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================
+             RIGHT COLUMN - MUMBAI HEATMAP
+        ======================================= -->
+
+            <div class="col-12 col-lg-8">
+
+                <div class="card mb-3 heatmap-card">
+
+                    <div id="mumbaiHeatmap"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        async function loadHeatRiskData() {
+
+            try {
+
+                // Fetch the already-formatted data from Express
+
+                const levelCard =
+                    document.getElementById("levelCard");
+
+
+                const response =
+                    await fetch("/api/latest-heat-data");
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        `Backend error: ${response.status}`
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                if (!data.success) {
+
+                    throw new Error(
+                        data.message || "Heat data unavailable"
+                    );
+
+                }
+
+
+                console.log(
+                    "Heat data from Express:",
+                    data
+                );
+
+
+                // Express returns these fields directly
+
+                const wbgt =
+                    Number(data.heatStress);
+
+
+                const hmri =
+                    Number(data.mortalityRisk);
+
+
+                const riskLevel =
+                    data.riskLevel;
+
+                // Update Peak Ambient Temperature
+                const ambientTemp =
+                    Number(data.temperature);
+
+                if (Number.isFinite(ambientTemp)) {
+                    document.getElementById("ambientTemp").textContent =
+                        `${ambientTemp.toFixed(1)}°C`;
+                } else {
+                    document.getElementById("ambientTemp").textContent =
+                        "Unavailable";
+                }
+
+
+                if (
+                    !Number.isFinite(wbgt) ||
+                    !Number.isFinite(hmri)
+                ) {
+
+                    throw new Error(
+                        "Invalid WBGT or HMRI value received from backend"
+                    );
+
+                }
+
+
+                // Convert backend risk level into a 1–5 scale
+
+                const riskScale = {
+
+                    "Low": 1,
+
+                    "Moderate": 2,
+
+                    "Medium": 3,
+
+                    "High": 4,
+
+                    "Very High": 4,
+
+                    "Extreme": 5,
+
+                    "Critical": 5
+
+                };
+
+
+                const mortalityRisk =
+                    riskScale[riskLevel] ?? 1;
+
+
+                /*
+                 * Correct JavaScript range check.
+                 * Original intent preserved.
+                 */
+
+                if (
+                    mortalityRisk >= 1 &&
+                    mortalityRisk < 3
+                ) {
+
+                    levelCard.classList.add(
+                        "bg-success"
+                    );
+
+                } else {
+
+                    levelCard.classList.add(
+                        "bg-danger"
+                    );
+
+                }
+
+
+                // Update WBGT card
+
+                document.getElementById(
+                    "wbgtValue"
+                ).textContent =
+                    `${wbgt.toFixed(2)}°C`;
+
+
+                // Update mortality risk header
+
+                document.getElementById(
+                    "mortalityRiskLevel"
+                ).textContent =
+                    `LEVEL ${mortalityRisk}`;
+
+
+                // Update message according to risk level
+
+                let riskMessage = "";
+
+
+                if (mortalityRisk <= 1) {
+
+                    riskMessage =
+                        "Normal monitoring recommended";
+
+                }
+
+                else if (mortalityRisk === 2) {
+
+                    riskMessage =
+                        "Increase monitoring of vulnerable groups";
+
+                }
+
+                else if (mortalityRisk === 3) {
+
+                    riskMessage =
+                        "Prepare additional medical resources";
+
+                }
+
+                else if (mortalityRisk === 4) {
+
+                    riskMessage =
+                        "Immediate intervention recommended";
+
+                }
+
+                else {
+
+                    riskMessage =
+                        "Emergency intervention required";
+
+                }
+
+
+                document.getElementById(
+                    "mortalityRiskMessage"
+                ).textContent =
+                    riskMessage;
+
+
+                console.log(
+                    "WBGT:",
+                    wbgt
+                );
+
+
+                console.log(
+                    "HMRI:",
+                    hmri
+                );
+
+
+                console.log(
+                    "Risk level:",
+                    riskLevel
+                );
+
+
+                console.log(
+                    "Mortality risk scale:",
+                    mortalityRisk
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Could not load heat-risk data:",
+                    error
+                );
+
+
+                document.getElementById(
+                    "wbgtValue"
+                ).textContent =
+                    "Error";
+
+
+                document.getElementById(
+                    "mortalityRiskLevel"
+                ).textContent =
+                    "Unavailable";
+
+
+                document.getElementById(
+                    "mortalityRiskMessage"
+                ).textContent =
+                    "Unable to connect to prediction backend";
+
+            }
+
+        }
+
+
+        /* ==========================================
+           START PAGE
+        ========================================== */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            loadHeatRiskData
+        );
+
+
+        /* ==========================================
+           LEAFLET MAP RESPONSIVENESS
+        ========================================== */
+
+        window.addEventListener(
+            "load",
+            function () {
+
+                setTimeout(
+                    function () {
+
+                        if (
+                            typeof map !== "undefined" &&
+                            map
+                        ) {
+
+                            map.invalidateSize();
+
+                        }
+
+                    },
+                    500
+                );
+
+            }
+        );
+
+
+        window.addEventListener(
+            "resize",
+            function () {
+
+                setTimeout(
+                    function () {
+
+                        if (
+                            typeof map !== "undefined" &&
+                            map
+                        ) {
+
+                            map.invalidateSize();
+
+                        }
+
+                    },
+                    200
+                );
+
+            }
+        );
+
+    </script>
