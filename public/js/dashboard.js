@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ]);
 
             // Intervention comes from the API's "actions" field
-            const actions = prediction.actions;
+            const actions = prediction.action ?? prediction.actions;
             let actionText = "No recommended action";
 
             if (Array.isArray(actions)) {
@@ -222,9 +222,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // Estimated Cost field: use allocated_budget
                 budgetAllocated: getNumericValue(prediction, [
+                    "budget_allocated_inr",
                     "allocated_budget"
                 ]),
-
                 greenCover: getNumericValue(prediction, [
                     "green_cover_score_1_to_5"
                 ])
@@ -242,23 +242,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+
     function displayWardPriorities(wards) {
         const table = document.querySelector("#wardPriorityTable tbody");
         if (!table) return;
 
         if (!wards.length) {
-            table.innerHTML = `<tr><td colspan="4">No ward data available.</td></tr>`;
+            table.innerHTML = `<tr><td colspan="5">No ward data available.</td></tr>`;
             return;
         }
 
         table.innerHTML = wards.map(ward => `
-            <tr>
-                <td>${ward.priority}</td>
-                <td>${ward.ward_name}</td>
-                <td>${ward.hmri.toFixed(2)}</td>
-                <td>${ward.riskLevel}</td>
-            </tr>
-        `).join("");
+        <tr>
+            <td>${ward.priority}</td>
+            <td>${ward.ward_name}</td>
+            <td>${ward.priorityScore === null ? "N/A" : ward.priorityScore.toFixed(2)}</td>
+            <td>${ward.wbgt === null ? "N/A" : ward.wbgt.toFixed(2) + "°C"}</td>
+            <td>${ward.riskLevel}</td>
+        </tr>
+    `).join("");
     }
 
     function getFeatureWardName(feature) {
@@ -383,106 +385,230 @@ document.addEventListener("DOMContentLoaded", () => {
         `).join("");
     }
 
-    function generateBudgetPlan() {
-        const selected = rankedWards
-            .filter(ward =>
-                ward.action &&
-                ward.action !== "No recommended action"
-            )
-            .map(ward => ({
-                wardId: ward.ward_id,
-                wardName: ward.ward_name,
-                priority: ward.priority,
-                intervention: ward.action,
-                cost: ward.budgetAllocated === null
-                    ? null
-                    : ward.budgetAllocated / 100000,
-                reduction: ward.before === null || ward.after === null
-                    ? null
-                    : ward.before - ward.after
+
+    async function generateBudgetPlan() {
+        const budgetInput = document.getElementById("budgetInput");
+        const button = document.getElementById("generateBudgetBtn");
+        const status = document.getElementById("budgetStatus");
+
+        const budgetLakh = Number(budgetInput?.value);
+
+        if (!Number.isFinite(budgetLakh) || budgetLakh <= 0) {
+            if (status) status.textContent = "Enter a budget greater than ₹0 lakh.";
+            return;
+        }
+
+        if (button) {
+            button.disabled = true;
+            button.textContent = "Calculating...";
+        }
+
+        if (status) status.textContent = "Requesting an updated allocation from the backend...";
+
+        try {
+            const response = await fetch("/api/budget-plan", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    budget_lakh: Number(budgetInput?.value)
+                })
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                throw new Error(
+                    data.detail || data.message || `Request failed (${response.status})`
+                );
+            }
+
+            if (!Array.isArray(data.wards)) {
+                throw new Error("The backend response does not contain a wards array.");
+            }
+
+            const wards = data.wards.map((ward, index) => {
+                const before = Number(ward.predicted_hmri);
+                const after = Number(ward.estimated_hmri_after_actions);
+                const allocated = Number(ward.budget_allocated_inr || 0);
+
+                return {
+                    ...ward,
+                    ward_id: Number(ward.ward_id),
+                    ward_name: ward.ward_name || `Ward ${ward.ward_id}`,
+                    priorityScore: Number(ward.priority_score),
+                    wbgt: Number(ward.predicted_wbgt),
+                    hmri: before,
+                    before: Number.isFinite(before) ? before : null,
+                    after: Number.isFinite(after) ? after : null,
+                    budgetAllocated: allocated,
+                    priority: index + 1,
+                    action: Array.isArray(ward.actions) && ward.actions.length
+                        ? ward.actions.map(action =>
+                            `${action.quantity} × ${action.action_label}`
+                        ).join(", ")
+                        : "No new action funded"
+                };
+            });
+
+            rankedWards = [...wards].sort(
+                (a, b) => b.priorityScore - a.priorityScore
+            ).map((ward, index) => ({
+                ...ward,
+                priority: index + 1
             }));
 
-        const spent = rankedWards.reduce(
-            (sum, ward) => sum + (ward.budgetAllocated ?? 0),
-            0
-        ) / 100000;
+            renderBudgetPlan(data);
+            displayWardPriorities(rankedWards);
 
-        const remaining = Math.max(0, FIXED_BUDGET - spent);
+            if (status) {
+                status.textContent =
+                    `Budget plan updated. ₹${(data.allocated_inr / 100000).toFixed(2)} lakh allocated.`;
+            }
+        } catch (error) {
+            console.error("Budget plan request failed:", error);
 
-        const valid = rankedWards.filter(
-            ward => ward.before !== null && ward.after !== null
+            if (status) {
+                status.textContent = `Could not generate the plan: ${error.message}`;
+            }
+        } finally {
+            if (button) {
+                button.disabled = false;
+                button.textContent = "Generate Budget Plan";
+            }
+        }
+    }
+
+    function renderBudgetPlan(data) {
+        const moneyInLakh = value =>
+            `₹${(Number(value || 0) / 100000).toFixed(2)} lakh`;
+
+        const wards = data.wards || [];
+        const fundedWards = wards.filter(
+            ward => Number(ward.budget_allocated_inr || 0) > 0
         );
 
-        const averageBefore = valid.length
-            ? valid.reduce((sum, ward) => sum + ward.before, 0) / valid.length
-            : 0;
+        const beforeValues = wards
+            .map(ward => Number(ward.predicted_hmri))
+            .filter(Number.isFinite);
 
-        const averageAfter = valid.length
-            ? valid.reduce((sum, ward) => sum + ward.after, 0) / valid.length
-            : 0;
+        const afterValues = wards
+            .map(ward => Number(ward.estimated_hmri_after_actions))
+            .filter(Number.isFinite);
 
-        const reduction = averageBefore - averageAfter;
-        const covered = new Set(selected.map(item => item.wardId)).size;
+        const average = values => values.length
+            ? values.reduce((sum, value) => sum + value, 0) / values.length
+            : null;
+
+        const averageBefore = average(beforeValues);
+        const averageAfter = average(afterValues);
 
         const summary = document.getElementById("budgetSummary");
 
         if (summary) {
             summary.innerHTML = `
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <strong>Available Budget</strong>
-                        <h4>₹${FIXED_BUDGET.toFixed(2)} L</h4>
-                    </div>
-                    <div class="col-md-3">
-                        <strong>Allocated Budget</strong>
-                        <h4>₹${spent.toFixed(2)} L</h4>
-                    </div>
-                    <div class="col-md-3">
-                        <strong>Remaining Budget</strong>
-                        <h4>₹${remaining.toFixed(2)} L</h4>
-                    </div>
-                    <div class="col-md-3">
-                        <strong>Wards With Actions</strong>
-                        <h4>${covered}</h4>
-                    </div>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <strong>Available Budget</strong>
+                    <h4>${moneyInLakh(data.budget_inr)}</h4>
                 </div>
-                <hr>
-                <strong>Average HMRI Before:</strong> ${averageBefore.toFixed(2)}<br>
-                <strong>Average Estimated HMRI After:</strong> ${averageAfter.toFixed(2)}<br>
-                <strong>Estimated Average HMRI Reduction:</strong> ${reduction.toFixed(2)} points<br>
-                <small>Post-action values and allocations are model estimates returned by the backend.</small>
-            `;
+                <div class="col-md-3">
+                    <strong>Allocated Budget</strong>
+                    <h4>${moneyInLakh(data.allocated_inr)}</h4>
+                </div>
+                <div class="col-md-3">
+                    <strong>Unspent Budget</strong>
+                    <h4>${moneyInLakh(data.unspent_inr)}</h4>
+                </div>
+                <div class="col-md-3">
+                    <strong>Wards With Funding</strong>
+                    <h4>${fundedWards.length}</h4>
+                </div>
+            </div>
+            <hr>
+            <strong>Average HMRI Before:</strong>
+            ${averageBefore === null ? "N/A" : averageBefore.toFixed(2)}<br>
+            <strong>Average Estimated HMRI After:</strong>
+            ${averageAfter === null ? "N/A" : averageAfter.toFixed(2)}<br>
+            <strong>Estimated Average HMRI Reduction:</strong>
+            ${averageBefore === null || averageAfter === null
+                    ? "N/A"
+                    : (averageBefore - averageAfter).toFixed(2) + " points"
+                }<br>
+            <small>
+                HMRI reductions are model estimates, not verified real-world outcomes.
+            </small>
+        `;
         }
 
         const plan = document.getElementById("recommendedPlan");
 
         if (plan) {
-            plan.innerHTML = selected.length
-                ? selected.map(item => `
-                    <tr>
-                        <td>${item.wardName} (Priority ${item.priority})</td>
-                        <td>${item.intervention}</td>
-                        <td>${item.cost === null ? "N/A" : `₹${item.cost.toFixed(2)} lakh`}</td>
-                        <td>${item.reduction === null ? "N/A" : `${item.reduction.toFixed(2)} points`}</td>
-                    </tr>
-                `).join("")
-                : `<tr><td colspan="4">No recommended actions returned by the API.</td></tr>`;
+            const fundedActions = wards.flatMap(ward =>
+                (ward.actions || []).map(action => ({
+                    wardName: ward.ward_name || `Ward ${ward.ward_id}`,
+                    action,
+                    before: Number(ward.predicted_hmri),
+                    after: Number(ward.estimated_hmri_after_actions)
+                }))
+            );
+
+            plan.innerHTML = fundedActions.length
+                ? fundedActions.map(item => `
+                <tr>
+                    <td>${escapeHtml(item.wardName)}</td>
+                    <td>
+                        ${escapeHtml(item.action.action_label || item.action.action_key)}
+                        × ${Number(item.action.quantity || 0)}
+                    </td>
+                    <td>${moneyInLakh(item.action.total_cost_inr)}</td>
+                    <td>
+                        ${Number.isFinite(item.before) && Number.isFinite(item.after)
+                        ? (item.before - item.after).toFixed(2) + " HMRI points"
+                        : "N/A"
+                    }
+                    </td>
+                </tr>
+            `).join("")
+                : `<tr><td colspan="4">No interventions were allocated.</td></tr>`;
         }
 
         const beforeAfter = document.getElementById("beforeAfterTable");
 
         if (beforeAfter) {
-            beforeAfter.innerHTML = rankedWards.map(ward => `
+            beforeAfter.innerHTML = wards.map((ward, index) => {
+                const before = Number(ward.predicted_hmri);
+                const after = Number(ward.estimated_hmri_after_actions);
+
+                return `
                 <tr>
-                    <td>${ward.ward_name}</td>
-                    <td>${ward.priority}</td>
-                    <td>${ward.before === null ? "N/A" : ward.before.toFixed(2)}</td>
-                    <td>${ward.after === null ? "N/A" : ward.after.toFixed(2)}</td>
-                    <td>${ward.before === null || ward.after === null ? "N/A" : `${(ward.before - ward.after).toFixed(2)} points`}</td>
+                    <td>${escapeHtml(ward.ward_name || `Ward ${ward.ward_id}`)}</td>
+                    <td>${index + 1}</td>
+                    <td>${Number.isFinite(before) ? before.toFixed(2) : "N/A"}</td>
+                    <td>${Number.isFinite(after) ? after.toFixed(2) : "N/A"}</td>
+                    <td>
+                        ${Number.isFinite(before) && Number.isFinite(after)
+                        ? (before - after).toFixed(2) + " points"
+                        : "N/A"
+                    }
+                    </td>
                 </tr>
-            `).join("");
+            `;
+            }).join("");
         }
     }
+
+    function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, character => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[character]);
+    }
+
 
     function updateWardMetrics() {
         const wardSelect = document.getElementById("wardSelect");
@@ -625,7 +751,6 @@ document.addEventListener("DOMContentLoaded", () => {
             createHeatmap(geojson, wards, predictions);
             populateWardSelect(predictions);
             renderInterventionMenu();
-            generateBudgetPlan();
 
             console.table(rankedWards);
 
@@ -670,7 +795,8 @@ document.addEventListener("DOMContentLoaded", () => {
             showMetricError();
         }
     }
-
+    document.getElementById("generateBudgetBtn")
+        ?.addEventListener("click", generateBudgetPlan);
     initializeDashboard();
 
     window.addEventListener("resize", () => map.invalidateSize());

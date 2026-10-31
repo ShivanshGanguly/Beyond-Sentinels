@@ -397,17 +397,11 @@
                 <thead>
                     <tr>
                         <th>Ward</th>
-                        <th>Priority Score</th>
                         <th>Intervention</th>
                         <th>Estimated Cost</th>
-                        <th>HMRI Before</th>
-                        <th>Estimated HMRI After</th>
-                        <th>Estimated HMRI Reduction</th>
+                        <th>Reduction in Vulnerability</th>
                     </tr>
                 </thead>
-                <button id="generateBudgetBtn" type="button">
-                    Generate Budget Plan
-                </button>
                 <tbody id="recommendedPlan">
                     <tr>
                         <td colspan="7">Enter a budget and generate a plan.</td>
@@ -451,29 +445,6 @@
                 </div>
             </div>
 
-            <h4>Recommended Spending Plan</h4>
-
-            <div id="budgetSummary" class="alert alert-info">
-                Generating budget plan...
-            </div>
-
-            <div class="table-responsive mb-4">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Ward</th>
-                            <th>Intervention</th>
-                            <th>Estimated Cost</th>
-                            <th>Estimated Vulnerability Reduction</th>
-                        </tr>
-                    </thead>
-                    <tbody id="recommendedPlan">
-                        <tr>
-                            <td colspan="4">Loading recommendations...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
             <div id="comparision">
                 <h4>Before and After: Ward Vulnerability</h4>
 
@@ -482,7 +453,7 @@
                         <thead class="table-dark">
                             <tr>
                                 <th>Ward</th>
-                                <th>Priority</th>
+                                <th>Ward ID</th>
                                 <th>Before</th>
                                 <th>After</th>
                                 <th>Reduction</th>
