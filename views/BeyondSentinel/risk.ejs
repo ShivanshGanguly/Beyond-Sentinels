@@ -2,42 +2,55 @@
 
     <style>
         :root {
-            --navy: #102653;
-            --blue: #2563eb;
-            --red: #e8485b;
-            --orange: #f59e0b;
-            --green: #0f9f83;
-            --light-bg: #f5f8ff;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
+            --navy: #0b1220;
+            --blue: #42d9f5;
+            --cyan: #59c7ff;
+            --teal: #2dd4bf;
+            --red: #fb7185;
+            --orange: #fbbf24;
+            --green: #34d399;
+            --bg: #07111f;
+            --panel: #0d1b2b;
+            --panel-light: #13263a;
+            --border: #263b55;
+            --text: #e5eefb;
+            --muted: #9aadc4;
         }
 
         body {
-            background: #f5f7fc;
+            background: var(--bg) !important;
+            color: var(--text);
+        }
+
+        .dashboard,
+        #risk,
+        #intervene,
+        #budgetPlanner {
+            color: var(--text);
+            background: transparent;
         }
 
         .dashboard {
             padding: 18px;
-            color: var(--navy);
         }
 
         .dashboard-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 20px;
             flex-wrap: wrap;
-            padding: 22px 26px;
+            gap: 20px;
+            padding: 24px 28px;
             margin-bottom: 22px;
+            background: linear-gradient(120deg, #11263b, #102033);
+            border: 1px solid var(--border);
             border-radius: 18px;
-            background: linear-gradient(110deg, #fff0f2, #f1f5ff, #fff1f2);
-            border: 1px solid #f3e1e5;
-            box-shadow: 0 5px 18px rgba(16, 38, 83, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
         .dashboard-header h1 {
             margin: 0;
-            color: var(--navy);
+            color: var(--text);
             font-size: clamp(1.7rem, 3vw, 2.5rem);
             font-weight: 800;
             letter-spacing: -1px;
@@ -48,40 +61,48 @@
         }
 
         .ward-select-wrapper label {
-            color: var(--navy);
+            color: var(--text);
             font-size: 0.9rem;
             margin-bottom: 7px;
         }
 
-        .ward-select {
+        .ward-select,
+        #intervene .form-control,
+        #intervene .form-select {
             width: 100%;
             padding: 11px 14px;
-            border: 1px solid #d8e0ef;
+            background-color: #091827 !important;
+            color: var(--text) !important;
+            border: 1px solid #36516f;
             border-radius: 10px;
-            background-color: #fff;
-            color: var(--navy);
-            font-weight: 500;
-            box-shadow: 0 2px 6px rgba(16, 38, 83, 0.04);
         }
 
-        .ward-select:focus {
-            border-color: var(--blue);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        .ward-select:focus,
+        #intervene .form-control:focus,
+        #intervene .form-select:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(89, 199, 255, 0.15);
+        }
+
+        .ward-select option,
+        #intervene .form-select option {
+            background: var(--panel);
+            color: var(--text);
         }
 
         .heatmap-card {
             width: 100%;
             padding: 8px;
+            background: var(--panel);
             border: 1px solid var(--border);
             border-radius: 17px;
-            background: #fff;
-            box-shadow: 0 5px 20px rgba(16, 38, 83, 0.06);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
             overflow: hidden;
         }
 
         #mumbaiHeatmap {
-            height: 550px;
             width: 100%;
+            height: 550px;
             border-radius: 12px;
             z-index: 1;
         }
@@ -93,15 +114,17 @@
             justify-content: center;
             min-height: 170px;
             padding: 22px;
+            background: var(--panel) !important;
+            color: var(--text) !important;
+            border: 1px solid var(--border) !important;
             border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 5px 16px rgba(16, 38, 83, 0.06);
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+            transition: transform 0.2s ease, border-color 0.2s ease;
         }
 
         .metric-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 9px 22px rgba(16, 38, 83, 0.1);
+            transform: translateY(-3px);
+            border-color: var(--cyan) !important;
         }
 
         .metric-card h5 {
@@ -109,6 +132,7 @@
             font-weight: 700;
             margin-bottom: 18px;
             line-height: 1.5;
+            color: var(--muted);
         }
 
         .metric-card h1 {
@@ -116,175 +140,316 @@
             font-weight: 800;
             margin: 0;
             overflow-wrap: anywhere;
+            color: var(--cyan);
         }
 
         .metric-card.bg-danger-subtle {
-            background: linear-gradient(135deg, #fff0f1, #fffafa);
-            color: #a51e35;
-            border: 1px solid #ffb8c1 !important;
+            background: linear-gradient(135deg, #271a2a, #171a2a) !important;
+            border-color: #854052 !important;
+        }
+
+        .metric-card.bg-danger-subtle h1 {
+            color: var(--red);
         }
 
         .metric-card.bg-warning-subtle {
-            background: linear-gradient(135deg, #fff7e8, #fffdfa);
-            color: #a34a0a;
-            border: 1px solid #ffd38b !important;
+            background: linear-gradient(135deg, #29251a, #191e2a) !important;
+            border-color: #80632e !important;
+        }
+
+        .metric-card.bg-warning-subtle h1 {
+            color: var(--orange);
         }
 
         .metric-card.bg-info-subtle {
-            background: linear-gradient(135deg, #eaf5ff, #f8fbff);
-            color: #16449a;
-            border: 1px solid #9bd0ff !important;
+            background: linear-gradient(135deg, #112b3c, #121d30) !important;
+            border-color: #285c78 !important;
         }
 
-        #intervene {
-            margin-top: 24px;
+        .metric-card.bg-info-subtle h1 {
+            color: var(--cyan);
+        }
+
+        #intervene,
+        #budgetPlanner {
+            margin: 26px 0;
             padding: 24px;
+            background: linear-gradient(145deg, #0d1b2b, #0a1726) !important;
+            color: var(--text) !important;
+            border: 1px solid var(--border);
             border-radius: 18px;
-            background: linear-gradient(120deg, #eff7ff, #ffffff);
-            border: 1px solid #dceafa;
-            box-shadow: 0 5px 18px rgba(16, 38, 83, 0.04);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
         }
 
-        #intervene>h1 {
-            color: var(--navy);
-            font-size: clamp(1.8rem, 3vw, 2.4rem);
+        #intervene h1,
+        #intervene h2,
+        #intervene h3,
+        #budgetPlanner h1,
+        #budgetPlanner h2,
+        #budgetPlanner h3,
+        #budgetPlanner h4 {
+            color: var(--text) !important;
             font-weight: 800;
-            margin-bottom: 22px;
+        }
+
+        #intervene h1,
+        #intervene h2 {
+            font-size: clamp(1.6rem, 3vw, 2.25rem);
+            margin-bottom: 16px;
         }
 
         #intervene h3 {
-            color: var(--navy);
             font-size: 1.35rem;
-            font-weight: 750;
             margin-bottom: 18px;
         }
 
-        .table-responsive {
-            border-radius: 12px;
-            margin-bottom: 8px;
+        #intervene p,
+        #budgetPlanner p {
+            color: var(--muted);
+            line-height: 1.7;
         }
 
-        .table {
-            margin-bottom: 0;
-            vertical-align: middle;
-            background: #fff;
-            border-color: var(--border);
+        #intervene .mb-3 {
+            margin-top: 22px;
+            padding: 20px;
+            background: var(--panel) !important;
+            border: 1px solid var(--border);
+            border-radius: 14px;
         }
 
-        .table thead th {
-            padding: 15px 17px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            white-space: nowrap;
+        #intervene label {
+            display: block;
+            color: var(--text);
+            font-weight: 650;
+            margin-bottom: 10px;
         }
 
-        .table tbody td {
-            padding: 14px 17px;
-            color: #475569;
-            font-size: 0.92rem;
+        #budgetInput {
+            max-width: 360px;
+            min-height: 48px;
         }
 
-        #wardPriorityTable thead {
-            background: var(--red);
-            color: #fff;
+        #generateBudgetBtn {
+            min-height: 45px;
+            padding: 11px 20px;
+            color: #071522;
+            background: linear-gradient(135deg, var(--cyan), var(--teal));
+            border: none;
+            border-radius: 10px;
+            font-weight: 750;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        #wardPriorityTable thead th {
-            background: var(--red);
-            color: #fff;
-            border-color: rgba(255, 255, 255, 0.2);
+        #generateBudgetBtn:hover {
+            color: #071522;
+            background: #72e7fa;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(45, 212, 191, 0.2);
         }
 
-        .table tbody tr:hover {
-            background: #f3f7ff;
+        #generateBudgetBtn:focus-visible {
+            outline: 2px solid var(--cyan);
+            outline-offset: 3px;
+        }
+
+        #budgetStatus {
+            margin: 16px 0;
+            color: var(--cyan) !important;
+            font-weight: 600;
+        }
+
+        #budgetSummary {
+            margin: 20px 0;
+            padding: 20px;
+            background: #102438 !important;
+            color: var(--text) !important;
+            border: 1px solid #28516a;
+            border-radius: 14px;
+            line-height: 1.8;
+        }
+
+        #budgetSummary h1,
+        #budgetSummary h2,
+        #budgetSummary h3,
+        #budgetSummary h4,
+        #budgetSummary h5 {
+            color: var(--cyan) !important;
+        }
+
+        #budgetSummary strong {
+            color: var(--teal);
         }
 
         .budget-section {
             margin: 26px 0;
-            padding: 0;
-            border: 1px solid #cceee5;
+            padding: 0 !important;
+            background: #0b1727 !important;
+            border: 1px solid var(--border);
             border-radius: 18px;
-            background: linear-gradient(145deg, #f1fffb, #ffffff 45%);
-            box-shadow: 0 5px 20px rgba(15, 159, 131, 0.06);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
             overflow: hidden;
         }
 
         .budget-header {
             padding: 24px 26px;
-            background: linear-gradient(110deg, #e4f8f2, #f1fbff);
-            border-bottom: 1px solid #d6eee8;
+            background: linear-gradient(115deg, #14283c, #102333 55%, #10313b) !important;
+            border-bottom: 1px solid var(--border);
         }
 
         .budget-header h2 {
-            color: #103b4b;
+            color: var(--text) !important;
             font-size: clamp(1.5rem, 3vw, 2.1rem);
             font-weight: 800;
             margin-bottom: 9px;
         }
 
         .budget-header p {
-            color: #426777;
+            color: var(--muted) !important;
             margin: 0;
             font-size: 0.98rem;
         }
 
         .budget-content {
             padding: 22px;
+            background: #0b1727 !important;
+            color: var(--text) !important;
         }
 
         .budget-card {
             height: 100%;
             padding: 22px;
             border-radius: 15px;
-            background: linear-gradient(135deg, #dff9ef, #f0fffa);
-            border: 1px solid #83d9bc;
-            box-shadow: 0 4px 14px rgba(15, 159, 131, 0.08);
+            background: linear-gradient(135deg, #123c43, #122b3c) !important;
+            color: var(--text) !important;
+            border: 1px solid #287b80;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
 
         .budget-card strong {
-            color: #12634f;
+            color: #a7e9e7 !important;
             font-size: 1rem;
         }
 
         .budget-card h2 {
-            color: #075c4c;
+            color: var(--teal) !important;
             font-size: clamp(2rem, 4vw, 2.5rem);
             font-weight: 800;
             margin-top: 12px;
         }
 
         .budget-content h4 {
-            color: var(--navy);
+            color: var(--cyan) !important;
             font-size: 1.15rem;
             font-weight: 750;
             margin-bottom: 14px;
         }
 
-        #interventionMenu thead th {
-            background: #167d78;
-            color: #fff;
+        #comparision {
+            margin-top: 10px;
+            padding: 20px;
+            background: #0d1b2b !important;
+            color: var(--text) !important;
+            border: 1px solid var(--border);
+            border-radius: 15px;
         }
 
-        #recommendedPlan thead th,
-        .budget-content .table-dark th {
-            background: #294d78;
-            color: #fff;
+        #comparision h4 {
+            color: var(--cyan) !important;
+            margin-bottom: 18px;
         }
 
-        #budgetSummary {
-            padding: 18px;
-            border: 1px solid #b8dcff;
+        .table-responsive {
+            margin-bottom: 8px;
+            border: 1px solid var(--border);
             border-radius: 12px;
-            background: #eff7ff;
-            color: #164b87;
-            line-height: 1.9;
+            background: var(--panel) !important;
+            overflow-x: auto;
         }
 
-        #budgetSummary h4 {
-            margin-top: 6px;
+        #intervene .table,
+        #budgetPlanner .table {
+            width: 100%;
+            margin-bottom: 0;
+            vertical-align: middle;
+            color: var(--text) !important;
+            background: var(--panel) !important;
+            border-color: var(--border) !important;
+            --bs-table-bg: #0d1b2b;
+            --bs-table-color: #d7e5f1;
+            --bs-table-border-color: #263b55;
+            --bs-table-hover-bg: #172d42;
+            --bs-table-hover-color: #ffffff;
+        }
+
+        #intervene .table thead th,
+        #budgetPlanner .table thead th {
+            padding: 15px 17px;
+            font-size: 0.9rem;
+            font-weight: 750;
+            white-space: nowrap;
+            color: #eafaff !important;
+            background: #16344b !important;
+            border-color: var(--border) !important;
+        }
+
+        #intervene .table tbody tr,
+        #budgetPlanner .table tbody tr {
+            background: #0d1b2b !important;
+        }
+
+        #intervene .table tbody td,
+        #budgetPlanner .table tbody td {
+            padding: 14px 17px;
+            font-size: 0.92rem;
+            color: #c8d7e9 !important;
+            background: #0d1b2b !important;
+            border-color: var(--border) !important;
+        }
+
+        #intervene .table tbody tr:hover td,
+        #budgetPlanner .table tbody tr:hover td {
+            color: #ffffff !important;
+            background: #172d42 !important;
+        }
+
+        #intervene .table .table-dark,
+        #budgetPlanner .table .table-dark,
+        #intervene .table thead.table-dark th,
+        #budgetPlanner .table thead.table-dark th,
+        #intervene .table-dark th,
+        #budgetPlanner .table-dark th {
+            color: #eafaff !important;
+            background: #16344b !important;
+            border-color: var(--border) !important;
+        }
+
+        #recommendedPlan td,
+        #beforeAfterTable td {
+            color: var(--muted) !important;
+        }
+
+        #wardPriorityTable thead th {
+            background: #7f293e !important;
+            color: #ffffff !important;
+            border-color: var(--border) !important;
+        }
+
+        #interventionMenu thead th {
+            background: #12433f !important;
+            color: #eafffb !important;
+        }
+
+        #recommendedPlan thead th {
+            background: #16344b !important;
+            color: #eafaff !important;
+        }
+
+        #risk .card {
+            color: var(--text);
         }
 
         @media (max-width: 991px) {
@@ -319,7 +484,8 @@
                 padding: 17px;
             }
 
-            #intervene {
+            #intervene,
+            #budgetPlanner {
                 padding: 15px;
             }
 
@@ -331,15 +497,41 @@
                 padding: 19px;
             }
 
-            .table thead th,
-            .table tbody td {
+            #comparision {
+                padding: 12px;
+            }
+
+            #intervene .table thead th,
+            #budgetPlanner .table thead th,
+            #intervene .table tbody td,
+            #budgetPlanner .table tbody td {
                 padding: 11px;
                 font-size: 0.82rem;
+            }
+
+            #budgetInput {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            #generateBudgetBtn {
+                width: 100%;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
             }
         }
     </style>
 
-    <div class="container-fluid dashboard" id="risk">
+    <div class="container-fluid dashboard theme-midnight" id="risk">
         <div class="dashboard-header">
             <h1 class="heading-1 fw-bold">Risk Heatmap</h1>
 
@@ -376,7 +568,7 @@
             </div>
         </div>
     </div>
-    <section id="intervene">
+    <section class="container-fluid theme-midnight" id="intervene">
         <h2>Cool Block Commander: Budget Planner</h2>
         <p>Allocate a budget to reduce heat vulnerability across Mumbai wards.</p>
 
@@ -412,40 +604,10 @@
     </section>
 
 
-    <section class="container-fluid budget-section">
-        <div class="budget-header">
-            <h2>Cool Block Commander: Budget Planner</h2>
-            <p>Allocate the fixed budget of ₹50 lakh to reduce heat vulnerability across Mumbai wards.</p>
-        </div>
+    <section class="container-fluid budget-section theme-midnight" id="budgetPlanner">
 
         <div class="budget-content">
-            <div class="row g-4 align-items-stretch mb-4">
-                <div class="col-12 col-md-4">
-                    <div class="budget-card">
-                        <strong>Available Budget</strong>
-                        <h2 class="mb-0">₹50 Lakh</h2>
-                    </div>
-                </div>
-
-                <div class="col-12 col-md-8">
-                    <h4>Intervention Menu and Assumptions</h4>
-
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Intervention</th>
-                                    <th>Cost per Ward Package</th>
-                                    <th>Assumed Vulnerability Reduction</th>
-                                </tr>
-                            </thead>
-                            <tbody id="interventionMenu"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div id="comparision">
+            <div id="comparision" class="theme-midnight">
                 <h4>Before and After: Ward Vulnerability</h4>
 
                 <div class="table-responsive">

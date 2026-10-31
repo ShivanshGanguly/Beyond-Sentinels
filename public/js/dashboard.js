@@ -452,13 +452,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 };
             });
 
-            rankedWards = [...wards].sort(
-                (a, b) => b.priorityScore - a.priorityScore
-            ).map((ward, index) => ({
-                ...ward,
-                priority: index + 1
-            }));
 
+            rankedWards = [...wards]
+                .map(ward => {
+                    const hmri = Math.max(0, Number(ward.hmri) || 0);
+                    const wbgt = Math.max(0, Number(ward.wbgt) || 0);
+
+                    // Combine heat risk and wet-bulb globe temperature.
+                    const priorityScore = (0.6 * hmri) + (0.4 * wbgt);
+
+                    return {
+                        ...ward,
+                        priorityScore: Number(priorityScore.toFixed(2))
+                    };
+                })
+                .sort((a, b) => b.priorityScore - a.priorityScore)
+                .map((ward, index) => ({
+                    ...ward,
+                    priority: index + 1
+                }));
             renderBudgetPlan(data);
             displayWardPriorities(rankedWards);
 
@@ -545,34 +557,51 @@ document.addEventListener("DOMContentLoaded", () => {
         const plan = document.getElementById("recommendedPlan");
 
         if (plan) {
-            const fundedActions = wards.flatMap(ward =>
-                (ward.actions || []).map(action => ({
+            const fundedActions = wards.flatMap(ward => {
+                const before = Number(ward.predicted_hmri);
+                const after = Number(ward.estimated_hmri_after_actions);
+
+                const reduction =
+                    Number.isFinite(before) && Number.isFinite(after)
+                        ? before - after
+                        : null;
+
+                return (ward.actions || []).map(action => ({
                     wardName: ward.ward_name || `Ward ${ward.ward_id}`,
                     action,
-                    before: Number(ward.predicted_hmri),
-                    after: Number(ward.estimated_hmri_after_actions)
-                }))
-            );
+                    reduction
+                }));
+            });
+
+            // Sort by reduction: highest to lowest.
+            fundedActions.sort((a, b) => {
+                if (a.reduction === null) return 1;
+                if (b.reduction === null) return -1;
+                return b.reduction - a.reduction;
+            });
 
             plan.innerHTML = fundedActions.length
                 ? fundedActions.map(item => `
-                <tr>
-                    <td>${escapeHtml(item.wardName)}</td>
-                    <td>
-                        ${escapeHtml(item.action.action_label || item.action.action_key)}
-                        × ${Number(item.action.quantity || 0)}
-                    </td>
-                    <td>${moneyInLakh(item.action.total_cost_inr)}</td>
-                    <td>
-                        ${Number.isFinite(item.before) && Number.isFinite(item.after)
-                        ? (item.before - item.after).toFixed(2) + " HMRI points"
-                        : "N/A"
+            <tr>
+                <td>${escapeHtml(item.wardName)}</td>
+                <td>
+                    ${escapeHtml(
+                    item.action.action_label || item.action.action_key
+                )}
+                    × ${Number(item.action.quantity || 0)}
+                </td>
+                <td>${moneyInLakh(item.action.total_cost_inr)}</td>
+                <td>
+                    ${item.reduction === null
+                        ? "N/A"
+                        : item.reduction.toFixed(2) + " HMRI points"
                     }
-                    </td>
-                </tr>
-            `).join("")
+                </td>
+            </tr>
+        `).join("")
                 : `<tr><td colspan="4">No interventions were allocated.</td></tr>`;
         }
+
 
         const beforeAfter = document.getElementById("beforeAfterTable");
 
