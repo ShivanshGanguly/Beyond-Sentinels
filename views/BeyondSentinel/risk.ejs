@@ -376,30 +376,47 @@
             </div>
         </div>
     </div>
+    <section id="intervene">
+        <h2>Cool Block Commander: Budget Planner</h2>
+        <p>Allocate a budget to reduce heat vulnerability across Mumbai wards.</p>
 
-    <div class="container-fluid" id="intervene">
-        <h1 class="heading-1 fw-bold">Intervene</h1>
-        <h3>Ward Priority Ranking</h3>
+        <div class="mb-3">
+            <label for="budgetInput">Total Budget (₹ lakh)</label>
+            <input id="budgetInput" type="number" min="0.01" step="0.01" value="50" class="form-control">
+            <button id="generateBudgetBtn" type="button" class="btn btn-primary mt-2">
+                Generate Budget Plan
+            </button>
+        </div>
 
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover" id="wardPriorityTable">
+        <p id="budgetStatus" role="status"></p>
+
+        <div id="budgetSummary"></div>
+
+        <div class="table-responsive mt-3">
+            <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>Priority</th>
                         <th>Ward</th>
-                        <th>HMRI</th>
-                        <th>WBGT</th>
-                        <th>Risk Level</th>
+                        <th>Priority Score</th>
+                        <th>Intervention</th>
+                        <th>Estimated Cost</th>
+                        <th>HMRI Before</th>
+                        <th>Estimated HMRI After</th>
+                        <th>Estimated HMRI Reduction</th>
                     </tr>
                 </thead>
-                <tbody>
+                <button id="generateBudgetBtn" type="button">
+                    Generate Budget Plan
+                </button>
+                <tbody id="recommendedPlan">
                     <tr>
-                        <td colspan="5">Loading ward priorities...</td>
+                        <td colspan="7">Enter a budget and generate a plan.</td>
                     </tr>
                 </tbody>
             </table>
         </div>
-    </div>
+    </section>
+
 
     <section class="container-fluid budget-section">
         <div class="budget-header">
@@ -485,4 +502,4 @@
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="/public/js/dashboard.js" defer></script>
+    <script src="/js/dashboard.js" defer></script>
